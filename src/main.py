@@ -6,9 +6,9 @@ from utils.transformers import get_model_inputs, get_model_answer
 
 def check_if_codebase_indexed(codebase_name):
     """Check if the codebase has been indexed."""
-    if ChromaStore.collection_has_data():
-        print(f"Codebase {codebase_name} is already indexed. Would you like to re-index?")
-        response = input("Enter 'yes' to re-index or 'no' to skip: ")
+    if ChromaStore.collection_exists(codebase_name):
+        print(f"Collection for {codebase_name} is already existent. Most probably has already been indexed. Would you like to (re)-index?")
+        response = input("Enter 'Yes' to re-index or 'No' to skip: ")
         if response.lower() in ['yes', 'y']:
             return False
         else:    
