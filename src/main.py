@@ -1,16 +1,15 @@
 import os
 from utils.file_loader import load_code_files
 from embeddings.embedder import get_embedding
-from storage.chroma_store import store_embedding, collection_has_data
+from storage.chroma_store import ChromaStore
 from search.query import search_code
-from storage.chroma_store import set_collection
 
 def check_if_codebase_indexed(codebase_name):
     """Check if the codebase has been indexed."""
-    if collection_has_data():
-        print("Codebase is already indexed. Would you like to re-index?")
+    if ChromaStore.collection_has_data():
+        print(f"Codebase {codebase_name} is already indexed. Would you like to re-index?")
         response = input("Enter 'yes' to re-index or 'no' to skip: ")
-        if response.lower() == "yes":
+        if response.lower() in ['yes', 'y']:
             return False
         else:    
             print("Skipping indexing process.")
@@ -19,7 +18,7 @@ def check_if_codebase_indexed(codebase_name):
 
 def index_codebase(directory):
     last_entry = os.path.basename(directory)
-    set_collection(last_entry)
+    ChromaStore.set_collection(last_entry)
     
     if check_if_codebase_indexed(last_entry):
         return
@@ -28,9 +27,10 @@ def index_codebase(directory):
     
     """Indexes all code files in the specified directory."""
     code_files = load_code_files(directory)
+    print(f"Found {len(code_files)} code files.")
     for filename, code in code_files.items():
         embedding = get_embedding(code).tolist()
-        store_embedding(filename, embedding, code)
+        ChromaStore.store_embedding(filename, embedding, code)
     print("✅ Codebase indexed successfully!")
 
 def search():
@@ -52,6 +52,6 @@ if __name__ == "__main__":
     
     if choice == "1":
         directory = input("Enter the path to your codebase: ")
-        check_if_codebase_indexed(directory)
+        index_codebase(directory)
     elif choice == "2":
         search()
