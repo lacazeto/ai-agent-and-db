@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "chromadb-project"
+version = "0.1.0"
+description = "A project to run ChromaDB in persistent mode with FAISS indexing."
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+chromadb = "^0.6.3"
+faiss-cpu = "^1.7.2"
+numpy = "^1.21.0"
+transformers = "^4.49.0"
+torch = "^2.6.0"
+fastapi = "^0.115.11"
+pydantic = "^2.10.6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
