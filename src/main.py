@@ -1,8 +1,8 @@
 import os
 from utils.file_loader import load_code_files
-from embeddings.embedder import get_embedding
+from utils.transformers import get_embedding, get_model_inputs, get_model_answer
 from storage.chroma_store import ChromaStore
-from search.query import search_code
+from search.query import search_embeddings
 
 def check_if_codebase_indexed(codebase_name):
     """Check if the codebase has been indexed."""
@@ -33,16 +33,29 @@ def index_codebase(directory):
         ChromaStore.store_embedding(filename, embedding, code)
     print("✅ Codebase indexed successfully!")
 
-def search():
-    """Runs the search query loop."""
+def search(codebase_name):
+    """Runs the search query loop with batched embeddings."""
+    ChromaStore.set_collection(codebase_name)
+
     while True:
         query = input("Enter your search query (or 'exit' to quit): ")
         if query.lower() == "exit":
             break
-        results = search_code(query)
-        print("🔍 Found matching code snippets:")
-        for result in results:
-            print(f"📂 {result['filename']}:\n{result['code']}\n{'-'*40}")
+
+        # Retrieve multiple relevant code snippets
+        retrieved_snippets = search_embeddings(query, top_k=3)
+
+        # Combine snippets to create a larger context
+        context = "\n\n".join(retrieved_snippets)
+
+        # Ensure it's within model token limit
+        context = context[:4096]  # Truncate if needed
+
+        # Create model input with larger context
+        inputs = get_model_inputs(context, query)
+
+        # Get answer
+        return get_model_answer(inputs)
 
 if __name__ == "__main__":
     print("🔹 Code Search CLI 🔹")
@@ -54,4 +67,6 @@ if __name__ == "__main__":
         directory = input("Enter the path to your codebase: ")
         index_codebase(directory)
     elif choice == "2":
-        search()
+        print("🔍 Search Codebase: Please make sure to go through step 1 before searching!")
+        codebase_name = input("Enter the codebase name: ")
+        search(codebase_name)

@@ -1,6 +1,6 @@
 ## Installation Instructions
 
-To set up the project with `faiss` you'll need `conda` as it is not available on poetry. The rest of the dependencies can be done using `poetry`:
+To set up the project with `faiss` you'll need `conda` as it is not available on poetry. The rest of the dependencies can be installed using `poetry`:
 
 1. **Create a `conda` environment:**
 
@@ -35,4 +35,4 @@ Also, the -instruct variation is specifically optimized for tasks where clear in
 
 https://huggingface.co/deepseek-ai/deepseek-coder-1.3b-instruct
 
-When running the llm_server.py for the 1st time, the LLM will be automatically added to your ~/.cache/huggingface/hub folder.
+When running the `llm_server.py` or `src/main.py` for the 1st time, the LLM will be automatically added to your ~/.cache/huggingface/hub folder.
