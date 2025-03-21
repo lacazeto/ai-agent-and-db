@@ -1,9 +1,31 @@
+import os
 from utils.file_loader import load_code_files
 from embeddings.embedder import get_embedding
-from storage.chroma_store import store_embedding
+from storage.chroma_store import store_embedding, collection_has_data
 from search.query import search_code
+from storage.chroma_store import set_collection
+
+def check_if_codebase_indexed(codebase_name):
+    """Check if the codebase has been indexed."""
+    if collection_has_data():
+        print("Codebase is already indexed. Would you like to re-index?")
+        response = input("Enter 'yes' to re-index or 'no' to skip: ")
+        if response.lower() == "yes":
+            return False
+        else:    
+            print("Skipping indexing process.")
+            return True
+    return False
 
 def index_codebase(directory):
+    last_entry = os.path.basename(directory)
+    set_collection(last_entry)
+    
+    if check_if_codebase_indexed(last_entry):
+        return
+
+    print(f"Indexing codebase in directory: {last_entry}")
+    
     """Indexes all code files in the specified directory."""
     code_files = load_code_files(directory)
     for filename, code in code_files.items():
@@ -30,6 +52,6 @@ if __name__ == "__main__":
     
     if choice == "1":
         directory = input("Enter the path to your codebase: ")
-        index_codebase(directory)
+        check_if_codebase_indexed(directory)
     elif choice == "2":
         search()

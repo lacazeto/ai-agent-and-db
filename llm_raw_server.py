@@ -36,10 +36,10 @@ def read_files_in_directory(directory_path, file_extension=None):
 def ask_deepseek(question, context=""):
     """Use DeepSeek-Coder to answer questions based on a given context."""
     prompt = f"Context:\n{context}\n\nQuestion:\n{question}\n\nAnswer:"
-    inputs = tokenizer(prompt, return_tensors="pt").to("cuda" if torch.cuda.is_available() else model.device)
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
     with torch.no_grad():
-        outputs = model.generate(**inputs, max_length=512)
+        outputs = model.generate(**inputs, max_new_tokens=4096)
 
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
