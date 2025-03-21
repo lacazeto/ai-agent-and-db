@@ -11,7 +11,7 @@ model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map=DEVICE, trus
 
 def read_file(file_path):
     """Read the content of a single file."""
-    with open(file_path, "rb") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
     return content
 
@@ -28,7 +28,7 @@ def read_files_in_directory(directory_path, file_extension=None):
                 continue
 
             file_path = os.path.join(root, file_name)
-            with open(file_path, "rb") as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
                 combined_content += f"\n\n--- End of file: {file_name} ---\n\n{content}"
 

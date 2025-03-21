@@ -55,13 +55,13 @@ def search(codebase_name):
 if __name__ == "__main__":
     print("🔹 Code Search CLI 🔹")
     print("1. Index Codebase")
-    print("2. Search Code")
+    print("2. Ask about the Code")
     choice = input("Select an option: ")
     
     if choice == "1":
         directory = input("Enter the path to your codebase: ")
         index_codebase(directory)
     elif choice == "2":
-        print("🔍 Search Codebase: Please make sure to go through step 1 before searching!")
-        codebase_name = input("Enter the codebase name: ")
+        print("🔍 Ask about the Code: Please make sure to go through step 1 before asking!")
+        codebase_name = input("Enter the codebase name (ie. 'portal' for ~/.../portal): ")
         search(codebase_name)
