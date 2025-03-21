@@ -10,21 +10,12 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModel.from_pretrained(MODEL_NAME)
 
 def get_embedding(text: str) -> np.ndarray:
-    """Generate an embedding using DeepSeek-Coder."""
+    """Generate an embedding"""
     print(f"Generating embedding for: {text}")
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     with torch.no_grad():
         outputs = model(**inputs).last_hidden_state.mean(dim=1)
     return outputs.numpy().astype("float32").flatten()
-    
-
-def get_embeddings_batch(texts: list) -> np.ndarray:
-    """Generate embeddings for a batch of texts using DeepSeek-Coder."""
-    print(f"Generating embeddings for batch: {texts}")
-    inputs = tokenizer(texts, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs).last_hidden_state.mean(dim=1)
-    return outputs.numpy().astype("float32")
 
 def generate_inputs_from_embeddings(embeddings: np.ndarray) -> dict:
     """Generate inputs dictionary from embeddings for model inference."""

@@ -1,8 +1,8 @@
 import os
 from utils.file_loader import load_code_files
-from utils.transformers import get_embedding, get_model_inputs, get_model_answer
 from storage.chroma_store import ChromaStore
-from search.query import search_embeddings
+from utils.transformers import get_model_inputs, get_model_answer
+
 
 def check_if_codebase_indexed(codebase_name):
     """Check if the codebase has been indexed."""
@@ -29,8 +29,7 @@ def index_codebase(directory):
     code_files = load_code_files(directory)
     print(f"Found {len(code_files)} code files.")
     for filename, code in code_files.items():
-        embedding = get_embedding(code).tolist()
-        ChromaStore.store_embedding(filename, embedding, code)
+        ChromaStore.store(filename, code)
     print("✅ Codebase indexed successfully!")
 
 def search(codebase_name):
@@ -43,10 +42,7 @@ def search(codebase_name):
             break
 
         # Retrieve multiple relevant code snippets
-        retrieved_snippets = search_embeddings(query, top_k=3)
-
-        # Combine snippets to create a larger context
-        context = "\n\n".join(retrieved_snippets)
+        context = ChromaStore.query_db(query, top_k=3)
 
         # Ensure it's within model token limit
         context = context[:4096]  # Truncate if needed
