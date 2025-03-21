@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 # Load DeepSeek-Coder model
-MODEL_NAME = "deepseek-ai/deepseek-coder-1.3b"
+MODEL_NAME = "deepseek-ai/deepseek-coder-1.3b-instruct"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModel.from_pretrained(MODEL_NAME)
 
