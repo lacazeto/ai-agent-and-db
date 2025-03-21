@@ -4,8 +4,10 @@ import os
 
 # Load DeepSeek-Coder
 MODEL_NAME = "deepseek-ai/deepseek-coder-1.3b-instruct"
+DEVICE="cuda" if torch.cuda.is_available() else "cpu"
+
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map=DEVICE, trust_remote_code=True)
 
 def read_file(file_path):
     """Read the content of a single file."""
@@ -32,16 +34,46 @@ def read_files_in_directory(directory_path, file_extension=None):
 
     return combined_content if combined_content else "No files found in the directory."
 
+def chunk_input(input_text, max_tokens=4096):
+    """Chunk the input text into smaller pieces that fit within the max token limit."""
+    inputs = tokenizer(input_text, return_tensors="pt", truncation=False)
+    input_length = inputs.input_ids.shape[1]
+
+    if input_length <= max_tokens:
+        return [input_text]  # No need to chunk if the input is already within the limit
+
+    # Chunk the input into segments that fit within the token limit
+    chunks = []
+    start = 0
+    while start < input_length:
+        end = min(start + max_tokens, input_length)
+        chunk = tokenizer.decode(inputs.input_ids[0, start:end], skip_special_tokens=True)
+        chunks.append(chunk)
+        start = end
+
+    return chunks
+
 # Function to interact with the model
 def ask_deepseek(question, context=""):
     """Use DeepSeek-Coder to answer questions based on a given context."""
     prompt = f"Context:\n{context}\n\nQuestion:\n{question}\n\nAnswer:"
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
-    with torch.no_grad():
-        outputs = model.generate(**inputs, max_new_tokens=4096)
+    # Chunk the input if it exceeds the max token length
+    chunks = chunk_input(prompt)
+    
+    # Process each chunk and aggregate the responses
+    responses = []
+    for chunk in chunks:
+        inputs = tokenizer(chunk, return_tensors="pt").to(DEVICE)
 
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+        with torch.no_grad():
+            outputs = model.generate(**inputs, max_new_tokens=512)  # Limit the output tokens
+
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        responses.append(response)
+
+    # Combine all responses into a single output
+    return " ".join(responses)
 
 def main():
     print("Welcome to the DeepSeek-Coder terminal interface with folder reading!")
@@ -82,12 +114,12 @@ def main():
             print(f"\nAnswer: {response}")
 
         elif action == 'ask':
-            # Direct question without context (user provides only question and context manually)
+            # Direct question without context (user provides question and context manually)
             question = input("Enter your question: ")
             context = input("Enter context (optional, press Enter to skip): ")
 
             # Get the response from the model
-            response = ask_deepseek(question, context)
+            response = ask_deepseek(question, context) 
             print(f"\nAnswer: {response}")
         
         else:

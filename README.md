@@ -29,6 +29,16 @@ curl -sSL https://install.python-poetry.org | python3 -
 poetry install
 ```
 
+## Running the LLM solo, without vectorDB or inMemory vector clustering
+
+```sh
+poetry run python llm_raw_server.py
+```
+
+Choose between asking a question (with manual input and optional context to be provided) or reading a directory (serving as context and manual input)
+
+## Note
+
 For this project we are using the lightweight variation of the DeepSeek-Coder LLM. It should be fine for an Apple Silicon MacBook.
 
 Also, the -instruct variation is specifically optimized for tasks where clear instructions are given, like explaining code, answering questions about code behavior, or giving detailed responses in a conversational manner. This model is more adept at interpreting human instructions and providing more contextually accurate responses.
