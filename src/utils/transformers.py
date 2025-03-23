@@ -1,4 +1,4 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModel, AutoModelForCausalLM, AutoTokenizer
 import torch
 import numpy as np
 
@@ -7,29 +7,48 @@ DEVICE="cuda" if torch.cuda.is_available() else "cpu"
 # Load DeepSeek-Coder model
 MODEL_NAME = "deepseek-ai/deepseek-coder-1.3b-instruct"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map=DEVICE, trust_remote_code=True)
+embedding_model = AutoModel.from_pretrained(MODEL_NAME, device_map=DEVICE, trust_remote_code=True)
+generation_model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map=DEVICE, trust_remote_code=True)
 
 
 def get_embedding(text: str) -> np.ndarray:
-    """Generate an embedding"""
+    """Converts text into an embedding vector for similarity search (ChromaDB)."""
     print(f"Generating embedding for: {text}")
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs).last_hidden_state.mean(dim=1)
-    return outputs.numpy().astype("float32").flatten()
 
-def generate_inputs_from_embeddings(embeddings: np.ndarray) -> dict:
-    """Generate inputs dictionary from embeddings for model inference."""
-    return torch.tensor(embeddings, dtype=torch.float32).unsqueeze(0).to(DEVICE)
+    # Format text consistently with model input
+    formatted_text = f"### Context:\n{text}\n\n### Answer:\n"
+    
+    inputs = tokenizer(formatted_text, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
+
+    with torch.no_grad():
+        outputs = embedding_model(**inputs, output_hidden_states=True)
+
+    # Extract last hidden state and pool it
+    hidden_states = outputs.hidden_states[-1]  # Last layer hidden states
+    embedding = hidden_states.mean(dim=1)  # Mean Pooling
+    embedding = torch.nn.functional.normalize(embedding, p=2, dim=1)  # L2 normalize
+
+    return embedding.cpu().numpy().astype("float32").flatten()
 
 def get_model_inputs(context: str, query: str) -> dict:
-    """Generate model inputs from context and query."""
-    return tokenizer(f"Context: {context}\n\nQuestion: {query}", return_tensors="pt", truncation=True, padding=True).to(DEVICE)
+    """Formats input into a structured prompt for text generation (LLM response)."""
+    prompt = f"""You are a helpful AI assistant that analyzes code.
+    
+==== RETRIEVED CODE CONTEXT ====
+{context}
 
-def get_model_outputs(inputs: dict) -> np.ndarray:
+==== USER QUERY ====
+{query}
+
+==== AI ANSWER ====
+"""
+    return tokenizer(prompt, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
+
+
+def get_model_outputs(inputs: dict) -> torch.Tensor:
     """Generate model outputs from inputs."""
     with torch.no_grad():
-        outputs = model.generate(**inputs, max_new_tokens=4096)
+        outputs = generation_model.generate(**inputs, max_new_tokens=512)
     return outputs
 
 def get_model_answer(inputs: dict) -> str:

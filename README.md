@@ -35,7 +35,7 @@ poetry install
 poetry run python llm_raw_server.py
 ```
 
-Choose between asking a question (with manual input and optional context to be provided) or reading a directory (serving as context and manual input). As a warning, last option won't ever finish if the directory is more than a couple files long, given we are chunking the Input into valid lengths and running them through the model.
+Choose between asking a question (with manual input and optional context to be provided) or reading a directory (serving as context and add a manual input). As a warning, last option won't really work as it struggles with large contexts, not meant to be used, just to serve as reference!
 
 ## Running the LLM alognside a vectorDB (for data persistance) and inMemory vector clustering (for faster search and clustering of vectors)
 
@@ -59,3 +59,8 @@ Also, the -instruct variation is specifically optimized for tasks where clear in
 https://huggingface.co/deepseek-ai/deepseek-coder-1.3b-instruct
 
 When running the `llm_server.py` or `src/main.py` for the 1st time, the LLM will be automatically added to your ~/.cache/huggingface/hub folder.
+
+## TODO
+
+- Use faiss for faster search instead of ChromaDB's default vector search.
+- Implement batch embedding to speed up indexing large codebases.

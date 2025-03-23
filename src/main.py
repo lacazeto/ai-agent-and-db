@@ -43,9 +43,6 @@ def search(codebase_name):
         # Retrieve multiple relevant code snippets
         context = ChromaStore.query_db(query, top_k=3)
 
-        # Ensure it's within model token limit
-        context = context[:4096]  # Truncate if needed
-
         # Create model input with larger context
         inputs = get_model_inputs(context, query)
 
