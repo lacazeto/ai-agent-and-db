@@ -1,6 +1,6 @@
 import os
 
-ignored_directories_and_files = ['node_modules', '.git', '.github', 'package-lock.json', 'yarn.lock']
+ignored_directories_and_files = ['node_modules', '.git', '.github', 'package-lock.json', 'yarn.lock', 'locales', 'dist', 'build', 'vendor', 'public', 'assets', 'images', 'fonts', 'css', 'js', 'static', 'coverage', 'docs', 'doc', 'example', 'examples']
 
 def load_code_files(directory: str):
     """Reads all code files in a directory and its subdirectories and returns their content."""

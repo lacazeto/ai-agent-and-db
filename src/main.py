@@ -43,11 +43,11 @@ def search(codebase_name):
         # Retrieve multiple relevant code snippets
         context = ChromaStore.query_db(query, top_k=3)
 
+        print("\n🔍 Top 3 Relevant Code Snippets:", context)
         # Create model input with larger context
         inputs = get_model_inputs(context, query)
-
-        # Get answer
-        return get_model_answer(inputs)
+       
+        print(get_model_answer(inputs))
 
 if __name__ == "__main__":
     print("🔹 Code Search CLI 🔹")
