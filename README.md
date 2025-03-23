@@ -7,7 +7,7 @@ To set up the project with `faiss` you'll need `conda` as it is not available on
 Open your terminal and run the following command to create a new `conda` environment:
 
 ```sh
-conda create -n chromadb-project python=3.12
+conda env create -f environment.yml
 ```
 
 2. **Activate the conda environment**
