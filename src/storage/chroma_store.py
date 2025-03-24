@@ -79,7 +79,8 @@ class HybridCodeIndexer:
                     "score": round(float(distances[0][i]), 4)
                 })
 
-        return results
+        filtered_results = [r for r in results if r["score"] < 0.4]  # Filter out high distances
+        return filtered_results
 
     def index_codebase(self, directory):
         """Reads all code files in a directory and indexes them using FAISS + ChromaDB."""

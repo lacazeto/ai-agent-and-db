@@ -28,7 +28,7 @@ def search(codebase_name):
             break
 
         # Retrieve multiple relevant code snippets
-        context = indexer.search_code(query, 5)
+        context = indexer.search_code(query, 7)
 
         # Create model input with larger context
         inputs = get_model_inputs(context, query)
