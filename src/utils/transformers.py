@@ -32,7 +32,7 @@ def get_embedding(text: str) -> np.ndarray:
 
 def get_model_inputs(context: str, query: str) -> dict:
     """Formats input into a structured prompt for text generation (LLM response)."""
-    prompt = f"""You are a helpful AI assistant that analyzes code.
+    prompt = f"""You are a helpful AI assistant that analyzes projects' code. The context contains multiple code snippets and the user query is a question about the code. You should provide an answer based on the context and the query.
     
 ==== RETRIEVED CODE CONTEXT ====
 {context}
@@ -45,13 +45,9 @@ def get_model_inputs(context: str, query: str) -> dict:
     return tokenizer(prompt, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
 
 
-def get_model_outputs(inputs: dict) -> torch.Tensor:
-    """Generate model outputs from inputs."""
-    with torch.no_grad():
-        outputs = generation_model.generate(**inputs, max_new_tokens=512)
-    return outputs
-
 def get_model_answer(inputs: dict) -> str:
     """Generate a model answer from inputs."""
-    outputs = get_model_outputs(inputs)
+    with torch.no_grad():
+        outputs = generation_model.generate(**inputs, max_new_tokens=512)
+
     return tokenizer.decode(outputs[0], skip_special_tokens=True)

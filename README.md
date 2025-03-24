@@ -62,5 +62,4 @@ When running the `llm_server.py` or `src/main.py` for the 1st time, the LLM will
 
 ## TODO
 
-- Use faiss for faster search instead of ChromaDB's default vector search.
 - Implement batch embedding to speed up indexing large codebases.

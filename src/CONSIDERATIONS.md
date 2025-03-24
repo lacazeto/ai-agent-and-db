@@ -25,3 +25,15 @@ Here's why vector databases are helpful:
 3. Scalability: When you have a large codebase or a vast collection of documentation, storing embeddings and indexing them in a vector DB allows for fast, scalable searching and retrieval, even if your dataset grows exponentially.
 
 4. Contextual Understanding: In programming, context matters a lot. The vector representation of your query (like a piece of code or a question) can be compared with vector representations of prior code or explanations, enabling the model to provide relevant suggestions based on context, not just the exact words.
+
+## FAISS
+
+For efficient similarity search and clustering of high-dimensional vectors. It is designed to handle large datasets of vectors and perform fast nearest neighbor searches, which are useful in a wide variety of machine learning tasks, such as recommendation systems, image and text search, and other applications involving embeddings
+
+## Potential Improvements
+
+- Scan all files in the repository (no exclusions).
+- For code files, continue to extract functions/classes using regex or AST (depending on the language) and index as embeddings for efficient search.
+- For configuration files, detect their format and extract relevant metadata (e.g., dependencies, frameworks, and version information).
+- Enhance ChromaDB to index not only code snippets but also framework-related information and dependencies.
+- Retrieve both code and metadata during search queries to provide a more comprehensive response.
